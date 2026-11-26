@@ -1,0 +1,20 @@
+# Пример из задания (учебник): конвейер из двух подпроцессов  ls -l | grep pip
+# Запуск:  ipython lab511_ipython.ipy      (или вставлять по частям в ipython)
+import os
+import sys
+from subprocess import Popen, PIPE
+
+BIN = os.path.dirname(sys.executable)      # каталог, где лежат python и pip
+
+def pipeline_example():
+    proces1 = Popen(["grep", "pip"], stdin=PIPE, stdout=PIPE, text=True)
+    proces2 = Popen(["ls", "-l", BIN], stdout=proces1.stdin, text=True)
+    out = proces1.communicate()[0]
+    proces2.wait()
+    return out
+
+print(pipeline_example())
+
+# Замер времени: один запуск, как в задании, и серия запусков для статистики
+%timeit -n 1 -r 1 pipeline_example()
+%timeit -n 20 -r 10 pipeline_example()
